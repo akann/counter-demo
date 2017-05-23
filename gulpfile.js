@@ -1,20 +1,27 @@
-const gulp = require('gulp');
 const babel = require('gulp-babel');
 const babelify = require('babelify');
 const browserify = require('browserify');
-const source = require('vinyl-source-stream');
-const sass = require('gulp-sass');
-const eslint = require('gulp-eslint');
-const nodemon = require('gulp-nodemon');
-// const uglify = require('gulp-uglify');
+const buffer = require('vinyl-buffer');
 const del = require('del');
+const eslint = require('gulp-eslint');
 const fontAwesome = require('node-font-awesome');
+const gulp = require('gulp');
+const nodemon = require('gulp-nodemon');
+const sass = require('gulp-sass');
+const source = require('vinyl-source-stream');
+const sourcemaps = require('gulp-sourcemaps');
+const uglify = require('gulp-uglify');
 
 gulp.task('js-client', () => {
-  browserify('./src/index.js')
+    browserify('./src/index.js')
+    .add(require.resolve('babel-polyfill'))
     .transform(babelify, {presets: ['es2015', 'react', 'stage-2']})
     .bundle()
     .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 });
 
